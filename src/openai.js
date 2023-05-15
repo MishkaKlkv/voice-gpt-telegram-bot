@@ -1,6 +1,6 @@
-import { Configuration, OpenAIApi } from 'openai';
+import {Configuration, OpenAIApi} from 'openai';
 import config from 'config';
-import { createReadStream } from 'fs';
+import {createReadStream} from 'fs';
 
 class OpenAI {
     roles = {
@@ -8,12 +8,14 @@ class OpenAI {
         USER: 'user',
         SYSTEM: 'system',
     };
+
     constructor(apiKey) {
         const configuration = new Configuration({
             apiKey,
         });
         this.openai = new OpenAIApi(configuration);
     }
+
     async chat(messages) {
         try {
             const response = await this.openai.createChatCompletion({
@@ -25,6 +27,7 @@ class OpenAI {
             console.log('Error while gpt chat', e.message);
         }
     }
+
     async transcription(filepath) {
         try {
             const response = await this.openai.createTranscription(
@@ -44,21 +47,21 @@ export const INITIAL_SESSION = {
     messages: [],
 }
 
-export async function  initCommand(ctx) {
-    ctx.session = INITIAL_SESSION
-    await ctx.reply('Waiting for yours voice or text message...')
+export async function initCommand(ctx) {
+    ctx.session = INITIAL_SESSION;
+    await ctx.reply('Waiting for yours voice or text message...');
 }
 
 export async function processTextToChat(ctx, content) {
     try {
-        ctx.session.messages.push({ role: openai.roles.USER, content })
-        const response = await openai.chat(ctx.session.messages)
+        ctx.session.messages.push({role: openai.roles.USER, content});
+        const response = await openai.chat(ctx.session.messages);
         ctx.session.messages.push({
             role: openai.roles.ASSISTANT,
             content: response.content,
-        })
-        await ctx.reply(response.content)
+        });
+        await ctx.reply(response.content);
     } catch (e) {
-        console.log('Error while procesing text to gpt', e.message)
+        console.log('Error while processing text to gpt', e.message);
     }
 }

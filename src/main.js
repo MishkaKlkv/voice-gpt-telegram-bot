@@ -1,11 +1,11 @@
-import { Telegraf, session } from 'telegraf';
+import {Telegraf, session} from 'telegraf';
 import config from 'config';
 import process from "nodemon";
 import {message} from "telegraf/filters";
 import {code} from "telegraf/format";
-import { ogg } from './ogg.js';
-import { removeFile } from './utils.js';
-import { openai, initCommand, processTextToChat, INITIAL_SESSION } from './openai.js';
+import {ogg} from './ogg.js';
+import {removeFile} from './utils.js';
+import {openai, initCommand, processTextToChat, INITIAL_SESSION} from './openai.js';
 
 const bot = new Telegraf(config.get('TELEGRAM_TOKEN'));
 bot.use(session());
@@ -28,13 +28,7 @@ bot.on(message('voice'), async (ctx) => {
         await removeFile(oggPath);
         const text = await openai.transcription(mp3Path);
         await ctx.reply(code(`Your query: ${text}`));
-        await processTextToChat(ctx, text)
-
-        ctx.session.messages.push({role: openai.roles.USER, content: text});
-        const response = await openai.chat(ctx.session.messages);
-        ctx.session.messages.push({role: openai.roles.ASSISTANT, content: response.content});
-
-        await ctx.reply(response.content);
+        await processTextToChat(ctx, text);
     } catch (e) {
         console.error(`Error while processing voice message`, e.message);
     }
@@ -44,12 +38,7 @@ bot.on(message('text'), async (ctx) => {
     ctx.session ??= INITIAL_SESSION;
     try {
         await ctx.reply(code('Got it. Waiting for response from server...'));
-
-        ctx.session.messages.push({role: openai.roles.USER, content: ctx.message.text});
-        const response = await openai.chat(ctx.session.messages);
-        ctx.session.messages.push({role: openai.roles.ASSISTANT, content: response.content});
-
-        await ctx.reply(response.content);
+        await processTextToChat(ctx, ctx.message.text);
     } catch (e) {
         console.error(`Error while processing voice message`, e.message);
     }

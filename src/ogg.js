@@ -1,9 +1,10 @@
 import ffmpeg from 'fluent-ffmpeg';
 import installer from '@ffmpeg-installer/ffmpeg';
-import { createWriteStream } from 'fs';
-import { dirname, resolve } from 'path';
-import { fileURLToPath } from 'url';
+import {createWriteStream} from 'fs';
+import {dirname, resolve} from 'path';
+import {fileURLToPath} from 'url';
 import axios from "axios";
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 class OggConverter {
